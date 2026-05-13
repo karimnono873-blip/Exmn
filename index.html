@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrigé Examen API - USTHB (Astronomic Theme)</title>
+    <style>
+        /* =========================================
+           THÈME ASTRONOMIC VIOLET & BLEU
+           ========================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap');
+
+        :root {
+            --bg-deep: #050510;
+            --panel-bg: rgba(20, 15, 45, 0.7);
+            --neon-blue: #00f3ff;
+            --neon-violet: #bc13fe;
+            --text-light: #e0e6ed;
+            --text-dim: #8b9bb4;
+            --success: #00ff88;
+            --danger: #ff0055;
+            --glass-border: rgba(188, 19, 254, 0.3);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Rajdhani', sans-serif;
+            background: radial-gradient(circle at 50% 0%, #1a0b2e, var(--bg-deep) 80%);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Effet d'étoiles en arrière-plan */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0));
+            background-size: 200px 200px;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 1rem;
+            border-bottom: 2px solid var(--neon-violet);
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.2);
+            background: linear-gradient(180deg, rgba(188,19,254,0.1) 0%, transparent 100%);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            text-shadow: 0 0 15px var(--neon-blue);
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+        }
+
+        h2 { font-weight: 400; color: var(--neon-violet); }
+        h3 { 
+            color: var(--neon-blue); 
+            border-bottom: 1px solid var(--glass-border); 
+            padding-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            background: var(--panel-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .section:hover {
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+        }
+
+        .citation {
+            font-size: 0.85rem;
+            color: var(--neon-violet);
+            background: rgba(188, 19, 254, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
+            border: 1px solid rgba(188, 19, 254, 0.3);
+        }
+
+        .answer-box {
+            background: rgba(0, 243, 255, 0.05);
+            border-left: 4px solid var(--neon-blue);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 1.1rem;
+        }
+
+        /* =========================================
+           UI LADDER GRAPHIQUE (SVG)
+           ========================================= */
+        .ladder-diagram {
+            background: #020205;
+            border: 2px solid var(--neon-blue);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+        }
+        .ladder-rail {
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 4px;
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+        .rail-left { left: 20px; }
+        .rail-right { right: 20px; }
+
+        .ladder-rung {
+            display: flex;
+            align-items: center;
+            height: 60px;
+            margin: 0 30px;
+            position: relative;
+        }
+        .rung-wire {
+            flex-grow: 1;
+            height: 2px;
+            background: var(--text-dim);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .element-wrapper {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #020205;
+            padding: 0 10px;
+        }
+        .element-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--neon-blue);
+            margin-bottom: 5px;
+        }
+        
+        /* Contacts & Coils SVGs */
+        .svg-contact { width: 30px; height: 30px; stroke: var(--text-light); stroke-width: 3; fill: none; }
+        .svg-coil { width: 40px; height: 40px; stroke: var(--neon-violet); stroke-width: 3; fill: none; }
+        
+        .active-wire { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .active-element { stroke: var(--success); filter: drop-shadow(0 0 5px var(--success)); }
+
+        /* =========================================
+           SIMULATEUR CUVES (EXO 2)
+           ========================================= */
+        .tanks-dashboard {
+            display: flex;
+            justify-content: space-around;
+            padding: 30px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            border: 1px solid var(--neon-violet);
+        }
+
+        .tank-system {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 25%;
+        }
+
+        .valve-graphic {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--text-dim);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-family: 'Orbitron', sans-serif;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            background: #111;
+        }
+        .valve-graphic.open {
+            border-color: var(--success);
+            color: var(--success);
+            box-shadow: 0 0 15px var(--success), inset 0 0 10px var(--success);
+        }
+
+        .tank-body {
+            width: 120px; height: 180px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(0, 243, 255, 0.02);
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.5);
+        }
+
+        .tank-water {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 0%;
+            background: linear-gradient(180deg, var(--neon-blue), #0055ff);
+            box-shadow: 0 0 20px var(--neon-blue);
+            transition: height 0.5s linear;
+        }
+
+        .tank-water::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: rgba(255,255,255,0.6);
+        }
+
+        .timer-hud {
+            margin-top: 15px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-violet);
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px var(--neon-violet);
+        }
+
+        .btn-panel {
+            text-align: center; margin-bottom: 20px;
+        }
+
+        button {
+            background: transparent;
+            color: var(--text-light);
+            border: 2px solid var(--neon-blue);
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 10px;
+        }
+        button:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+        button.btn-stop { border-color: var(--danger); }
+        button.btn-stop:hover { background: var(--danger); box-shadow: 0 0 20px var(--danger); }
+
+        /* =========================================
+           SIMULATEUR GRAFCET (EXO 3)
+           ========================================= */
+        .grafcet-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #020205;
+            border: 1px solid var(--neon-blue);
+            border-radius: 12px;
+            padding: 40px;
+        }
+
+        .g-node {
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .g-step {
+            width: 60px; height: 60px;
+            border: 2px solid var(--text-dim);
+            background: #111;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron', sans-serif; font-size: 1.5rem;
+            position: relative;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .g-step.initial { border: 6px double var(--text-dim); }
+        .g-step.active {
+            border-color: var(--neon-violet);
+            color: #fff;
+            background: rgba(188, 19, 254, 0.2);
+            box-shadow: 0 0 20px var(--neon-violet), inset 0 0 10px var(--neon-violet);
+        }
+
+        .g-action {
+            position: absolute; left: 80px;
+            border: 1px solid var(--text-dim);
+            padding: 5px 15px;
+            white-space: nowrap;
+            color: var(--neon-blue);
+        }
+        .g-step.active .g-action {
+            border-color: var(--neon-violet);
+            box-shadow: 0 0 10px var(--neon-violet);
+        }
+
+        .g-line-v { width: 2px; height: 40px; background: var(--text-dim); }
+        .g-line-h { height: 2px; width: 150px; background: var(--text-dim); }
+        
+        .g-trans {
+            position: relative;
+            width: 30px; height: 4px; background: var(--text-dim);
+            margin: 5px 0; cursor: pointer; transition: background 0.3s;
+        }
+        .g-trans:hover { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
+        .g-trans-label {
+            position: absolute; left: 40px; top: -10px;
+            color: var(--neon-blue); font-weight: bold; letter-spacing: 1px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>CORRIGÉ TYPE INTERACTIF</h1>
+        <h2>Programmation Avancée des API - Master AII - USTHB</h2>
+    </header>
+
+    <div class="container">
+
+        <section class="section">
+            <h3>I. Questions de cours (3 pts)</h3>
+            
+            <p><strong>1) Le temps de scrutation de l'API :</strong></p>
+            <div class="answer-box">
+                <strong>Réponse a)</strong> Est le temps mis par l'automate entre la lecture des entrées et la mise à jour des sorties.
+                <br>
+                <small style="color:var(--text-dim);"><em>Justification : Un automate fonctionne avec un temps de cycle (scan) qui englobe l'acquisition, le traitement logique, et l'émission des ordres. <span class="citation"></span></em></small>
+            </div>
+
+            <p><strong>2) Le "Watchdog timer" est :</strong></p>
+            <div class="answer-box">
+                <strong>Réponse b)</strong> Une minuterie de surveillance du temps de chaque cycle.
+                <br>
+                <small style="color:var(--text-dim);"><em>Justification : Si le programme entre dans une boucle infinie, le Watchdog détecte le dépassement du temps de scrutation maximal et place l'automate en sécurité.</em></small>
+            </div>
+
+            <p><strong>3) Les cartes intelligentes peuvent :</strong></p>
+            <div class="answer-box">
+                <strong>Réponse a)</strong> Effectuer des tâches de traitement complètement indépendantes du processeur CPU et de la fonction Scan de l'API.
+                <br>
+                <small style="color:var(--text-dim);"><em>Justification : Les cartes de comptage rapide (HSC) possèdent leur propre circuit électronique dédié, indépendant du scan principal pour ne pas perdre d'impulsions. <span class="citation"></span></em></small>
+            </div>
+        </section>
+
+        <section class="section">
+            <h3>II. Exercice N°1 : Navette de transfert FIFO (7 pts)</h3>
+            <p><strong>Analyse du Problème :</strong> La contrainte principale est la gestion FIFO (First-In, First-Out) lors d'arrivées simultanées. Dès qu'un produit est détecté, le tapis correspondant est arrêté <span class="citation"></span>.</p>
+            
+            <h4>Traduction LADDER (Représentation Graphique Norme CEI)</h4>
+            <p>Voici la logique de mémorisation de l'arrivée sur la Ligne 1 (Mémorisation dans AP1).</p>
+            
+            <div class="ladder-diagram">
+                <div class="ladder-rail rail-left"></div>
+                <div class="ladder-rail rail-right"></div>
+                
+                <div class="ladder-rung">
+                    <div class="rung-wire"></div>
+                    <div class="element-wrapper">
+                        <div class="element-label">a1 (Capteur L1)</div>
+                        <svg class="svg-contact" viewBox="0 0 30 30">
+                            <line x1="0" y1="15" x2="10" y2="15" />
+                            <line x1="10" y1="5" x2="10" y2="25" />
+                            <line x1="20" y1="5" x2="20" y2="25" />
+                            <line x1="20" y1="15" x2="30" y2="15" />
+                        </svg>
+                    </div>
+                    <div class="rung-wire"></div>
+                    <div class="element-wrapper">
+                        <div class="element-label">/Navette_L1</div>
+                        <svg class="svg-contact" viewBox="0 0 30 30">
+                            <line x1="0" y1="15" x2="10" y2="15" />
+                            <line x1="10" y1="5" x2="10" y2="25" />
+                            <line x1="20" y1="5" x2="20" y2="25" />
+                            <line x1="10" y1="25" x2="20" y2="5" /> <line x1="20" y1="15" x2="30" y2="15" />
+                        </svg>
+                    </div>
+                    <div class="rung-wire"></div>
+                    <div class="element-wrapper">
+                        <div class="element-label">AP1 (Set)</div>
+                        <svg class="svg-coil" viewBox="0 0 40 40">
+                            <line x1="0" y1="20" x2="5" y2="20" />
+                            <circle cx="20" cy="20" r="15" />
+                            <text x="14" y="25" fill="var(--neon-violet)" font-family="sans-serif" font-size="14">S</text>
+                            <line x1="35" y1="20" x2="40" y2="20" />
+                        </svg>
+                    </div>
+                    <div class="rung-wire"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h3>III. Exercice N°2 : Réacteur à cuves en cascade (6 pts)</h3>
+            <p><strong>Cahier des charges :</strong> Le cycle démarre avec le transfert du contenu du réservoir 1 vers le réservoir 2 pendant une durée contrôlée de 7 heures. <span class="citation"></span> Ensuite, purge du R2 vers R3 (8h), puis purge du R3 (5h) <span class="citation"></span>.</p>
+            
+            <div class="btn-panel">
+                <button onclick="startTanks()">▶ Lancer Séquence</button>
+                <button class="btn-stop" onclick="stopTanks()">⏹ Arrêt Urgence</button>
+            </div>
+
+            <div class="tanks-dashboard">
+                <div class="tank-system">
+                    <div class="valve-graphic" id="v1">V1</div>
+                    <div class="tank-body">
+                        <div class="tank-water" id="w1" style="height: 100%;"></div>
+                    </div>
+                    <div class="timer-hud">T1: <span id="t1-val">0</span> / 7h</div>
+                </div>
+                <div class="tank-system">
+                    <div class="valve-graphic" id="v2">V2</div>
+                    <div class="tank-body">
+                        <div class="tank-water" id="w2" style="height: 0%;"></div>
+                    </div>
+                    <div class="timer-hud">T2: <span id="t2-val">0</span> / 8h</div>
+                </div>
+                <div class="tank-system">
+                    <div class="valve-graphic" id="v3">V3</div>
+                    <div class="tank-body">
+                        <div class="tank-water" id="w3" style="height: 0%;"></div>
+                    </div>
+                    <div class="timer-hud">T3: <span id="t3-val">0</span> / 5h</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h3>IV. Exercice N°3 : Divergence GRAFCET (4 pts)</h3>
+            <p>Mise en équation d'un GRAFCET comportant une divergence en OU. L'équation d'activation de l'étape 1 utilise la condition logique <code>m.h</code>.</p>
+            
+            <div class="answer-box">
+                <strong>Équation de l'Étape 1 :</strong><br>
+                X1 = (Activation + Mémoire) . /Désactivation<br>
+                <span style="color: var(--neon-violet); font-family: 'Orbitron';">X1 = (X0 . m . h + X1) . /X2</span>
+            </div>
+
+            <p style="text-align: center; color: var(--text-dim);"><em>Cliquez sur les transitions (traits horizontaux) pour animer le franchissement.</em></p>
+
+            <div class="grafcet-wrapper">
+                <div class="g-node">
+                    <div class="g-step initial active" id="g0">0</div>
+                    <div class="g-line-v"></div>
+                    
+                    <div class="g-line-h"></div>
+                    
+                    <div style="display: flex; gap: 90px; justify-content: center;">
+                        <div class="g-node">
+                            <div class="g-line-v" style="height: 20px;"></div>
+                            <div class="g-trans" onclick="crossTransition('left')">
+                                <span class="g-trans-label">m.h</span>
+                            </div>
+                            <div class="g-line-v" style="height: 20px;"></div>
+                            <div class="g-step" id="g1">
+                                1
+                                <div class="g-action">A+</div>
+                            </div>
+                        </div>
+
+                        <div class="g-node">
+                            <div class="g-line-v" style="height: 20px;"></div>
+                            <div class="g-trans" onclick="crossTransition('right')">
+                                <span class="g-trans-label">n.d</span>
+                            </div>
+                            <div class="g-line-v" style="height: 20px;"></div>
+                            <div class="g-step" id="g3">
+                                3
+                                <div class="g-action">B-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // --- LOGIQUE SIMULATEUR CUVES ---
+        let tankSim = {
+            running: false,
+            time: 0,
+            interval: null
+        };
+
+        function updateTanks() {
+            if (!tankSim.running) return;
+            tankSim.time += 0.1; // Echelle: 1 sec = 1 heure
+            
+            let t = tankSim.time;
+            
+            let v1 = document.getElementById('v1');
+            let v2 = document.getElementById('v2');
+            let v3 = document.getElementById('v3');
+            
+            let w1 = document.getElementById('w1');
+            let w2 = document.getElementById('w2');
+            let w3 = document.getElementById('w3');
+
+            // Phase 1 : R1 -> R2 (0 à 7h)
+            if (t <= 7) {
+                v1.classList.add('open');
+                w1.style.height = (100 - (t/7)*100) + '%';
+                w2.style.height = ((t/7)*100) + '%';
+                document.getElementById('t1-val').innerText = t.toFixed(1);
+            } 
+            // Phase 2 : R2 -> R3 (7h à 15h)
+            else if (t > 7 && t <= 15) {
+                v1.classList.remove('open');
+                v2.classList.add('open');
+                let t_rel = t - 7;
+                w2.style.height = (100 - (t_rel/8)*100) + '%';
+                w3.style.height = ((t_rel/8)*100) + '%';
+                document.getElementById('t2-val').innerText = t_rel.toFixed(1);
+            }
+            // Phase 3 : Purge R3 (15h à 20h)
+            else if (t > 15 && t <= 20) {
+                v2.classList.remove('open');
+                v3.classList.add('open');
+                let t_rel = t - 15;
+                w3.style.height = (100 - (t_rel/5)*100) + '%';
+                document.getElementById('t3-val').innerText = t_rel.toFixed(1);
+            }
+            // Fin de cycle
+            else {
+                stopTanks();
+            }
+        }
+
+        function startTanks() {
+            if (tankSim.running) return;
+            tankSim.running = true;
+            tankSim.time = 0;
+            // Reset Visuel
+            document.getElementById('w1').style.height = '100%';
+            document.getElementById('w2').style.height = '0%';
+            document.getElementById('w3').style.height = '0%';
+            document.getElementById('t1-val').innerText = '0';
+            document.getElementById('t2-val').innerText = '0';
+            document.getElementById('t3-val').innerText = '0';
+            
+            tankSim.interval = setInterval(updateTanks, 100);
+        }
+
+        function stopTanks() {
+            tankSim.running = false;
+            clearInterval(tankSim.interval);
+            document.getElementById('v1').classList.remove('open');
+            document.getElementById('v2').classList.remove('open');
+            document.getElementById('v3').classList.remove('open');
+        }
+
+        // --- LOGIQUE SIMULATEUR GRAFCET ---
+        let activeGStep = 0;
+
+        function crossTransition(branch) {
+            let s0 = document.getElementById('g0');
+            let s1 = document.getElementById('g1');
+            let s3 = document.getElementById('g3');
+
+            if (activeGStep === 0) {
+                s0.classList.remove('active');
+                if (branch === 'left') {
+                    s1.classList.add('active');
+                    activeGStep = 1;
+                } else {
+                    s3.classList.add('active');
+                    activeGStep = 3;
+                }
+                
+                // Auto-reset après 3 secondes pour la démonstration
+                setTimeout(() => {
+                    s1.classList.remove('active');
+                    s3.classList.remove('active');
+                    s0.classList.add('active');
+                    activeGStep = 0;
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>
